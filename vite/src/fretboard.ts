@@ -14,7 +14,6 @@ class Fretboard {
 
 	note: Note[] = [];
 
-	tuning = [64, 59, 55, 50, 45, 40]; // E A D G B E
 	noteNames = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 	sharp = ['C♯', 'D♯', 'F♯', 'G♯', 'A♯'];
 	flat = ['D♭', 'E♭', 'G♭', 'A♭', 'B♭'];
@@ -49,13 +48,6 @@ class Fretboard {
 
 	}
 
-	getSymbol(stringID: number, fretID: number): string {
-		const midiID = this.tuning[stringID] + fretID
-		const symbol = this.noteNames[midiID % 12];
-		const level = Math.floor(midiID / 12) - 1;
-		return `${symbol}${level}`;
-	}
-
 	getLabel(fretID: number): string {
 		if (fretID === 0) {
 			return '弦枕';
@@ -68,10 +60,10 @@ class Fretboard {
 		this.genColor();
 
 		let s = `<table class="string ${setting.octave ? 'show' : 'hide'}-octave ${setting.color ? 'show' : 'hide'}-color">`;
-		[...Array(6).keys()].forEach(stringID => {
+		setting.tune.forEach((startTune, stringID) => {
 			s += `<tr class="string" id="string-${stringID}">`;
 			[...Array(setting.fret + 1).keys()].forEach(fretID => {
-				const midiID = this.tuning[stringID] + fretID;
+				const midiID = startTune + fretID;
 				const note = this.note[midiID];
 				let sn = '';
 
@@ -98,7 +90,7 @@ class Fretboard {
 		})
 		s += '</table><table class="label">';
 		s += `<tr>`;
-		[...Array(25).keys()].forEach(fretID => {
+		[...Array(setting.fret + 1).keys()].forEach(fretID => {
 			s += `<td class="fret"><div>${this.getLabel(fretID)}</div></td>`;
 		})
 		s += '</tr></table>';
@@ -108,9 +100,9 @@ class Fretboard {
 
 	genColor() {
 		let ol: number[] = [];
-		[...Array(6).keys()].forEach(stringID => {
+		setting.tune.forEach((startTune) => {
 			[...Array(setting.fret + 1).keys()].forEach(fretID => {
-				const midiID = this.tuning[stringID] + fretID;
+				const midiID = startTune + fretID;
 				const note = this.note[midiID];
 				ol.push(note.octave);
 			});
