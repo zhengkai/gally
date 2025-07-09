@@ -26,15 +26,15 @@ class Panel {
 
 	genHTML() {
 		let s = '<form>';
-		s += this.genFert();
+		s += this.genFret();
 		s += this.genNote();
 		s += this.genOctave();
+		s += this.genColor();
 		s += '</form>';
 		return s;
 	}
 
-	genFert() {
-
+	genFret() {
 		const r: radio = {
 			name: 'fret',
 			list: [22, 24].map((f) => ({
@@ -43,7 +43,6 @@ class Panel {
 			})),
 			select: setting.fret,
 		};
-		console.log(r);
 		return this.htmlRadio(r);
 	}
 
@@ -67,6 +66,18 @@ class Panel {
 				{ show: 'hide octave', v: 0 },
 			],
 			select: setting.octave ? 1 : 0,
+		};
+		return this.htmlRadio(r);
+	}
+
+	genColor() {
+		const r: radio = {
+			name: 'color',
+			list: [
+				{ show: 'show color', v: 1 },
+				{ show: 'hide color', v: 0 },
+			],
+			select: setting.color ? 1 : 0,
 		};
 		return this.htmlRadio(r);
 	}
@@ -104,6 +115,8 @@ class Panel {
 		setting.noteShow = (NoteList as readonly string[]).includes(note) ? note as NoteType : NoteList[0];
 
 		setting.octave = form.get('octave') === '1';
+
+		setting.color = form.get('color') === '1';
 
 		fretboard.run();
 	}

@@ -5,6 +5,7 @@ class Setting {
 	fret = 24; // 品数，22 或 24
 	noteShow: NoteType = NoteList[0];
 	octave = true;
+	color = true;
 }
 
 export const setting = new Setting();

@@ -1,4 +1,5 @@
 import { setting } from './setting'
+import { Hct, hexFromArgb } from "@material/material-color-utilities";
 
 interface Note {
 	midi: number;
@@ -64,7 +65,9 @@ class Fretboard {
 
 	genHTML() {
 
-		let s = `<table class="string ${setting.octave ? 'show-octave' : 'hide-octave'}">`;
+		this.genColor();
+
+		let s = `<table class="string ${setting.octave ? 'show' : 'hide'}-octave ${setting.color ? 'show' : 'hide'}-color">`;
 		[...Array(6).keys()].forEach(stringID => {
 			s += `<tr class="string" id="string-${stringID}">`;
 			[...Array(setting.fret + 1).keys()].forEach(fretID => {
@@ -86,22 +89,39 @@ class Fretboard {
 					}
 				}
 				if (pitch) {
-
 					let octave = setting.octave ? `<sub>${note.octave}</sub>` : '';
-					sn = `<div class="symbol">${pitch}${octave}</div>`;
+					sn = `<div class="symbol text-color-${note.octave}">${pitch}${octave}</div>`;
 				}
-				s += `<td class="fret" id="fret-${stringID}-${fretID}">${sn}</td>`;
+				s += `<td class="fret color-${note.octave}" id="fret-${stringID}-${fretID}">${sn}</td>`;
 			})
 			s += '</tr>';
 		})
 		s += '</table><table class="label">';
 		s += `<tr>`;
-		[...Array(25).keys()].forEach(fertID => {
-			s += `<td class="fret"><div>${this.getLabel(fertID)}</div></td>`;
+		[...Array(25).keys()].forEach(fretID => {
+			s += `<td class="fret"><div>${this.getLabel(fretID)}</div></td>`;
 		})
 		s += '</tr></table>';
 
 		return s;
+	}
+
+	genColor() {
+		let ol: number[] = [];
+		[...Array(6).keys()].forEach(stringID => {
+			[...Array(setting.fret + 1).keys()].forEach(fretID => {
+				const midiID = this.tuning[stringID] + fretID;
+				const note = this.note[midiID];
+				ol.push(note.octave);
+			});
+		});
+		ol = [...new Set(ol)].sort();
+
+		const len = ol.length;
+		ol.forEach((octave, i) => {
+			const color = hexFromArgb(Hct.from(360 * i / len, 75, 75).toInt());
+			document.documentElement.style.setProperty(`--text-color-${octave}`, color);
+		});
 	}
 }
 

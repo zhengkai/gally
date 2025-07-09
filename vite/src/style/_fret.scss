@@ -70,4 +70,12 @@
 			}
 		}
 	}
+
+	.show-color {
+		@for $i from 0 through 10 {
+			.text-color-#{$i} {
+				color: var(--text-color-#{$i});
+			}
+		}
+	}
 }
