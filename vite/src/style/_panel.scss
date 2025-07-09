@@ -1,0 +1,19 @@
+#panel {
+	user-select: none;
+	form > div {
+		display: inline-block;
+		margin-right: 32px;
+		label, input {
+			cursor: pointer;
+			word-break: keep-all;
+			white-space: nowrap;
+		}
+		label {
+			display: inline-block;
+			padding: 8px 8px;
+			&:hover {
+				background-color: rgba(255, 255, 255, 0.3);
+			}
+		}
+	}
+}
