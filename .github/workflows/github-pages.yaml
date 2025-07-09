@@ -1,0 +1,47 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ master ]  
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install --prefix vite  
+
+      - name: Build project
+        run: ./vite/node_modules/vite/bin/vite.js --base "/gally" build vite
+
+      - name: Prepare deployment
+        run: |
+          mkdir deploy
+          mv vite/dist deploy/public
+          # echo "gally.example.com" > deploy/public/CNAME  
+
+      - name: Deploy to gh-pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: deploy/public
+          clean: true
+          clean-exclude: |
+            .gitignore
+            CNAME
+          single-commit: true  
+          commit-message: "Deploy $(date +'%Y-%m-%d %H:%M:%S')"
+          force: true          
