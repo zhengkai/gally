@@ -1,5 +1,6 @@
 import { setting } from './setting'
 import { Hct, hexFromArgb } from "@material/material-color-utilities";
+import { sound } from './sound';
 
 interface Note {
 	midi: number;
@@ -22,7 +23,12 @@ class Fretboard {
 
 	run() {
 		this.init();
-		document.querySelector<HTMLDivElement>('#fretboard')!.innerHTML = this.genHTML();
+		const o = document.querySelector<HTMLDivElement>('#fretboard');
+		if (!o) {
+			return;
+		}
+		o.innerHTML = this.genHTML();
+		this.hookEvent(o);
 	}
 
 	init() {
@@ -120,7 +126,7 @@ class Fretboard {
 			const id = setting.color === 'octave' ? note.octave : note.midi;
 			color = ` text-color-${id}`;
 		}
-		s = `<div class="symbol${color}">${pitch}${octave}</div>`;
+		s = `<div class="${color}" data-midi="${note.midi}">${pitch}${octave}</div>`;
 		return s;
 	}
 
@@ -143,6 +149,15 @@ class Fretboard {
 		ol.forEach((octave, i) => {
 			const color = hexFromArgb(Hct.from(360 * i / len, 75, 75).toInt());
 			document.documentElement.style.setProperty(`--text-color-${octave}`, color);
+		});
+	}
+
+	hookEvent(o: HTMLElement) {
+		(o.querySelectorAll('div[data-midi]') as NodeListOf<HTMLDivElement>).forEach((el: HTMLDivElement) => {
+			el.addEventListener('click', () => {
+				const midi = parseInt(el.getAttribute('data-midi') || '0');
+				sound.playMIDI(midi);
+			});
 		});
 	}
 }
