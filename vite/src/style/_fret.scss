@@ -19,7 +19,6 @@
 				text-align: center;
 				position: absolute;
 				display: inline-block;
-				padding: 0 4px;
 				top: -12px;
 				background-color: #000;
 				left: 50%;
@@ -45,6 +44,7 @@
 				border-style: solid;
 				border-color: #999;
 				div {
+					padding: 0 4px;
 					font-weight: 600;
 					font-family: 'Courier New', Courier, monospace;
 				}
@@ -56,23 +56,43 @@
 			}
 		}
 	}
+
 	table.label {
-		margin-top: 48px;
+		margin-top: 16px;
 		td {
-			text-align: center;
-			border-width: 0 1px 1px 1px;
+			height: 16px;
+			padding: 0;
 			border-style: solid;
 			border-color: #333;
-			padding: 0;
-			height: 16px;
-			div {
-				width: 48px;
+		}
+		tr.marker {
+			font-size: 12px;
+			color: #777;
+			td {
+				border-width: 0 1px 1px 1px;
+			}
+			td.marker-1 > div {
+				top: -12px;
+			}
+			td.marker-2 > div {
+				top: -20px;
+				line-height: 16px;
+			}
+		}
+		tr.name {
+			td {
+				text-align: center;
+				border-width: 1px 1px 0 1px;
+				div {
+					top: 6px;
+					width: 48px;
+				}
 			}
 		}
 	}
 
 	.show-color {
-		@for $i from 0 through 10 {
+		@for $i from 0 through 128 {
 			.text-color-#{$i} {
 				color: var(--text-color-#{$i});
 			}

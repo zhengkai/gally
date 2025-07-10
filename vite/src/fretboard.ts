@@ -18,6 +18,8 @@ class Fretboard {
 	sharp = ['C♯', 'D♯', 'F♯', 'G♯', 'A♯'];
 	flat = ['D♭', 'E♭', 'G♭', 'A♭', 'B♭'];
 
+	marker = [3, 5, 7, 9, 12, 15, 17, 19, 21, 24];
+
 	run() {
 		this.init();
 		document.querySelector<HTMLDivElement>('#fretboard')!.innerHTML = this.genHTML();
@@ -50,61 +52,89 @@ class Fretboard {
 
 	getLabel(fretID: number): string {
 		if (fretID === 0) {
-			return '弦枕';
+			return 'Nut';
 		}
-		return `${fretID} 品`;
+		return `${fretID}`;
 	}
 
 	genHTML() {
-
-		this.genColor();
-
+		if (setting.color !== 'none') {
+			this.genColor(setting.color === 'octave');
+		}
 		let s = `<table class="string ${setting.octave ? 'show' : 'hide'}-octave ${setting.color ? 'show' : 'hide'}-color">`;
-		setting.tune.forEach((startTune, stringID) => {
+		setting.tone.forEach((startTone, stringID) => {
 			s += `<tr class="string" id="string-${stringID}">`;
 			[...Array(setting.fret + 1).keys()].forEach(fretID => {
-				const midiID = startTune + fretID;
+				const midiID = startTone + fretID;
 				const note = this.note[midiID];
-				let sn = '';
-
-				let pitch = '';
-				if (note.natural) {
-					pitch = note.pitch;
-				} else {
-					switch (setting.noteShow) {
-						case 'flat':
-							pitch = note.flat || note.pitch;
-							break;
-						case 'sharp':
-							pitch = note.sharp || note.pitch;
-							break;
-					}
-				}
-				if (pitch) {
-					let octave = setting.octave ? `<sub>${note.octave}</sub>` : '';
-					sn = `<div class="symbol text-color-${note.octave}">${pitch}${octave}</div>`;
-				}
-				s += `<td class="fret color-${note.octave}" id="fret-${stringID}-${fretID}">${sn}</td>`;
+				const sn = this.genHTMLNote(note);
+				s += `<td id="fret-${stringID}-${fretID}">${sn}</td>`;
 			})
 			s += '</tr>';
 		})
 		s += '</table><table class="label">';
-		s += `<tr>`;
+		s += `<tr class="marker">`;
 		[...Array(setting.fret + 1).keys()].forEach(fretID => {
-			s += `<td class="fret"><div>${this.getLabel(fretID)}</div></td>`;
+			if (this.marker.includes(fretID)) {
+				let marker = 1;
+				let h = '⬤';
+				if (fretID % 12 === 0) {
+					marker = 2;
+					h += "<br>" + h;
+				}
+				s += `<td class="marker-${marker}"><div>${h}</div></td>`;
+			} else {
+				s += `<td></td>`;
+			}
+		})
+		s += `</tr><tr class="name">`;
+		[...Array(setting.fret + 1).keys()].forEach(fretID => {
+			s += `<td><div>${this.getLabel(fretID)}</div></td>`;
 		})
 		s += '</tr></table>';
 
 		return s;
 	}
 
-	genColor() {
+	genHTMLNote(note: Note) {
+		let s = '';
+		let pitch = '';
+		if (note.natural) {
+			pitch = note.pitch;
+		} else {
+			switch (setting.noteShow) {
+				case 'flat':
+					pitch = note.flat || note.pitch;
+					break;
+				case 'sharp':
+					pitch = note.sharp || note.pitch;
+					break;
+			}
+		}
+		if (!pitch) {
+			return '';
+		}
+		let octave = setting.octave ? `<sub>${note.octave}</sub>` : '';
+		let color = '';
+		if (setting.color !== 'none') {
+			const id = setting.color === 'octave' ? note.octave : note.midi;
+			color = ` text-color-${id}`;
+		}
+		s = `<div class="symbol${color}">${pitch}${octave}</div>`;
+		return s;
+	}
+
+	genColor(byOctave = true) {
 		let ol: number[] = [];
-		setting.tune.forEach((startTune) => {
+		setting.tone.forEach((startTone) => {
 			[...Array(setting.fret + 1).keys()].forEach(fretID => {
-				const midiID = startTune + fretID;
-				const note = this.note[midiID];
-				ol.push(note.octave);
+				const midiID = startTone + fretID;
+				if (byOctave) {
+					const note = this.note[midiID];
+					ol.push(note.octave);
+				} else {
+					ol.push(midiID);
+				}
 			});
 		});
 		ol = [...new Set(ol)].sort();

@@ -1,5 +1,5 @@
-import { NoteList, setting } from './setting'
-import type { NoteType } from './setting';
+import { NoteList, ColorList, setting } from './setting'
+import type { NoteType, ColorType } from './setting';
 import { fretboard } from './fretboard'
 
 interface radio {
@@ -73,11 +73,11 @@ class Panel {
 	genColor() {
 		const r: radio = {
 			name: 'color',
-			list: [
-				{ show: 'show color', v: 1 },
-				{ show: 'hide color', v: 0 },
-			],
-			select: setting.color ? 1 : 0,
+			list: ColorList.map((c) => ({
+				show: c === 'midi' ? 'note' : c,
+				v: c,
+			})),
+			select: setting.color,
 		};
 		return this.htmlRadio(r);
 	}
@@ -116,7 +116,8 @@ class Panel {
 
 		setting.octave = form.get('octave') === '1';
 
-		setting.color = form.get('color') === '1';
+		let color = form.get('color') as string;
+		setting.color = (ColorList as readonly string[]).includes(color) ? color as ColorType : ColorList[0];
 
 		fretboard.run();
 	}
