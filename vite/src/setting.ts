@@ -1,4 +1,4 @@
-export const NoteList = ['natural-only', 'sharp', 'flat'] as const;
+export const NoteList = ['natural-only', 'number', 'sharp', 'flat'] as const;
 export type NoteType = typeof NoteList[number];
 
 export const ColorList = ['octave', 'midi', 'none'] as const;

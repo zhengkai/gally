@@ -9,11 +9,31 @@ body {
 		padding: 16px 0 0 16px
 	}
 	> header {
+		display: flex;
+		justify-content: space-between;
 		height: 100px;
+		padding: 0 16px;
 		h1 {
 			font-size: 24px;
 			display: inline-block;
-			margin: 0 16px;
+			margin-right: 16px;
+		}
+		a {
+			color: #ddd;
+			margin-top: 24px;
+			display: inline-block;
+			text-decoration: underline;
+			&:hover {
+				color: #fff;
+				text-decoration: none;
+			}
+		}
+		img {
+			vertical-align: middle;
+			height: 24px;
+			display: inline-block;
+			margin-right: 8px;
+			filter: invert(1) brightness(2);
 		}
 	}
 	> footer {

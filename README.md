@@ -1,4 +1,4 @@
-# Gally 吉他谱
+# Gally 吉他指版图
 
 <https://zhengkai.github.io/gally/>
 

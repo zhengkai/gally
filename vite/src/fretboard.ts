@@ -7,6 +7,7 @@ interface Note {
 	octave: number;
 	pitch: string;
 	natural: boolean;
+	number: number;
 	sharp: string | null;
 	flat: string | null;
 }
@@ -18,6 +19,7 @@ class Fretboard {
 	noteNames = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 	sharp = ['C♯', 'D♯', 'F♯', 'G♯', 'A♯'];
 	flat = ['D♭', 'E♭', 'G♭', 'A♭', 'B♭'];
+	number = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 
 	marker = [3, 5, 7, 9, 12, 15, 17, 19, 21, 24];
 
@@ -39,10 +41,12 @@ class Fretboard {
 			const pitch = this.noteNames[i % 12];
 			const idx = this.sharp.indexOf(pitch);
 			const natural = idx == -1;
+			const number = this.number.indexOf(pitch) + 1;
 			const note = {
 				midi: i,
 				octave: Math.floor(i / 12) - 1,
 				pitch,
+				number,
 				natural,
 				sharp: null,
 				flat: null,
@@ -67,7 +71,8 @@ class Fretboard {
 		if (setting.color !== 'none') {
 			this.genColor(setting.color === 'octave');
 		}
-		let s = `<table class="string ${setting.octave ? 'show' : 'hide'}-octave ${setting.color ? 'show' : 'hide'}-color">`;
+		let showOctave = (setting.octave && setting.noteShow !== 'number') ? 'show' : 'hide';
+		let s = `<table class="string ${showOctave}-octave ${setting.color ? 'show' : 'hide'}-color">`;
 		setting.tone.forEach((startTone, stringID) => {
 			s += `<tr class="string" id="string-${stringID}">`;
 			[...Array(setting.fret + 1).keys()].forEach(fretID => {
@@ -105,7 +110,11 @@ class Fretboard {
 	genHTMLNote(note: Note) {
 		let s = '';
 		let pitch = '';
-		if (note.natural) {
+		let octave = setting.octave ? `<sub>${note.octave}</sub>` : '';
+		if (setting.noteShow === 'number' && note.number) {
+			pitch = note.number.toString();
+			octave = '';
+		} else if (note.natural) {
 			pitch = note.pitch;
 		} else {
 			switch (setting.noteShow) {
@@ -120,7 +129,6 @@ class Fretboard {
 		if (!pitch) {
 			return '';
 		}
-		let octave = setting.octave ? `<sub>${note.octave}</sub>` : '';
 		let color = '';
 		if (setting.color !== 'none') {
 			const id = setting.color === 'octave' ? note.octave : note.midi;
